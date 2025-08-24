@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QGridLayout, QLabel, QVBoxLayout
 import random
-
+from PyQt5.QtWidgets import QComboBox
 class TicTacToe(QWidget):
     def __init__(self):
         super().__init__()
@@ -16,7 +16,11 @@ class TicTacToe(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         self.grid_layout = QGridLayout()
-
+        self.difficulty_box = QComboBox()
+        self.difficulty_box.addItems(["Easy", "Medium", "Hard"])
+        self.difficulty_box.setCurrentText("Hard")
+        layout.addWidget(QLabel("AI Difficulty:"))
+        layout.addWidget(self.difficulty_box)
         # Create buttons
         for row in range(3):
             for col in range(3):
@@ -59,7 +63,19 @@ class TicTacToe(QWidget):
             self.label.setText(f"Player: {'O' if player == 'X' else 'X'}")
 
     def ai_move(self):
-        _, move = self.minimax(self.board, True)
+        difficulty = self.difficulty_box.currentText()
+
+        if difficulty == "Easy":
+            move = random.choice(self.get_empty_cells(self.board))
+        elif difficulty == "Medium":
+            # 50% chance random, 50% minimax
+            if random.random() < 0.5:
+                move = random.choice(self.get_empty_cells(self.board))
+            else:
+                _, move = self.minimax(self.board, True)
+        else:  # Hard
+            _, move = self.minimax(self.board, True)
+
         if move:
             self.make_move(move[0], move[1], 'O')
 
